@@ -1,10 +1,10 @@
-name: 'S3 Upload Action'
+name: 'S3 Upload Action Pk'
 description: 'Upload files or directories to AWS S3 bucket'
 
 # Add these for marketplace
 author: 'pradeepkumar'
 branding:
-  icon: 's3-bucket'
+  icon: 'arrow-up-circle'
   color: 'blue'
 
 inputs:

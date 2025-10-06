@@ -1,7 +1,10 @@
 name: 'S3 Upload Action'
 description: 'Upload files or directories to AWS S3 bucket'
+
+# Add these for marketplace
+author: 'pradeepkumar'
 branding:
-  icon: 'upload-cloud'
+  icon: 's3-bucket'
   color: 'blue'
 
 inputs:

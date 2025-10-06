@@ -5,10 +5,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: DevOps-Refersh/Assignment-custom-action@S3-upload
+      - uses:
         with:
-          file: build.yml
-          bucket:action-pipeline-demo
+          sorce-path: build.yml
+          s3-bucket: action-pipeline-demo
           aws-region: us-east-1
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}

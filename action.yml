@@ -1,0 +1,83 @@
+name: 'S3 Upload Action'
+description: 'Upload files or directories to AWS S3 bucket'
+branding:
+  icon: 'upload-cloud'
+  color: 'blue'
+
+inputs:
+  aws-access-key-id:
+    description: 'AWS Access Key ID'
+    required: true
+  aws-secret-access-key:
+    description: 'AWS Secret Access Key'
+    required: true
+  aws-region:
+    description: 'AWS Region'
+    required: true
+    default: 'us-east-1'
+  s3-bucket:
+    description: 'S3 bucket name'
+    required: true
+  source-path:
+    description: 'Local path to file or directory to upload'
+    required: true
+  destination-path:
+    description: 'S3 destination path'
+    required: false
+    default: ''
+  delete:
+    description: 'Delete files in S3 that don''t exist locally'
+    required: false
+    default: 'false'
+
+outputs:
+  upload-url:
+    description: 'URL of the uploaded content'
+    value: ${{ steps.upload.outputs.upload-url }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Configure AWS credentials
+      shell: bash
+      run: |
+        aws configure set aws_access_key_id ${{ inputs.aws-access-key-id }}
+        aws configure set aws_secret_access_key ${{ inputs.aws-secret-access-key }}
+        aws configure set default.region ${{ inputs.aws-region }}
+      env:
+        AWS_ACCESS_KEY_ID: ${{ inputs.aws-access-key-id }}
+        AWS_SECRET_ACCESS_KEY: ${{ inputs.aws-secret-access-key }}
+        AWS_DEFAULT_REGION: ${{ inputs.aws-region }}
+
+    - name: Upload to S3
+      id: upload
+      shell: bash
+      run: |
+        # Check if source exists
+        if [ ! -e "${{ inputs.source-path }}" ]; then
+          echo "Error: Source path ${{ inputs.source-path }} does not exist"
+          exit 1
+        fi
+
+        # Construct S3 destination
+        DESTINATION="s3://${{ inputs.s3-bucket }}/${{ inputs.destination-path }}"
+        
+        # Upload based on delete flag
+        if [ "${{ inputs.delete }}" = "true" ]; then
+          aws s3 sync "${{ inputs.source-path }}" "$DESTINATION" --delete
+        else
+          aws s3 sync "${{ inputs.source-path }}" "$DESTINATION"
+        fi
+        
+        # Set output with S3 URL
+        echo "upload-url=https://${{ inputs.s3-bucket }}.s3.${{ inputs.aws-region }}.amazonaws.com/${{ inputs.destination-path }}" >> $GITHUB_OUTPUT
+      env:
+        AWS_ACCESS_KEY_ID: ${{ inputs.aws-access-key-id }}
+        AWS_SECRET_ACCESS_KEY: ${{ inputs.aws-secret-access-key }}
+        AWS_DEFAULT_REGION: ${{ inputs.aws-region }}
+
+    - name: Verify upload
+      shell: bash
+      run: |
+        echo "Upload completed successfully!"
+        echo "Access URL: ${{ steps.upload.outputs.upload-url }}"

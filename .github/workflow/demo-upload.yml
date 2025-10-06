@@ -1,14 +1,14 @@
-name: surya
+name: upload-s3-custom-action-demo
 on: push
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: ./.github/actions/aws-s3
+      - uses: DevOps-Refersh/Assignment-custom-action@S3-upload
         with:
           file: build.yml
-          bucket: 
-          aws-region: ap-south-1
+          bucket:action-pipeline-demo
+          aws-region: us-east-1
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
